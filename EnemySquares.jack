@@ -1,0 +1,113 @@
+// manages the enemy squares on the screen
+
+class EnemySquares {
+	field Array squaresX;
+	field Array squaresY;
+	field Array collisX;
+	field Array collisY;
+	field int counter;
+
+	constructor EnemySquares new() {
+		let counter = 1;
+		let squaresX = Array.new(8);
+		let squaresY = Array.new(8);
+		let collisX = Array.new(8);
+		let collisY = Array.new(8);
+		let squaresX[0] = 479;
+		//do zeroXArray();
+		do levelArray(30, 150, 180, 220, 1, 120, 90, 60);
+		return this;
+	}
+
+	/** Deallocates the Ball's memory. */
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    method void levelArray(int first, int second, int third, int fourth, int fifth, int sixth, int seventh, int eighth) {
+    	let squaresY[0] = first;
+    	let squaresY[1] = second;
+    	let squaresY[2] = third;
+    	let squaresY[3] = fourth;
+    	let squaresY[4] = fifth;
+    	let squaresY[5] = sixth;
+    	let squaresY[6] = seventh;
+    	let squaresY[7] = eighth;
+    	return;
+    }
+
+    method void shuffleYArray() {
+    	let squaresY[0] = squaresY[1];
+    	let squaresY[1] = squaresY[2];
+    	let squaresY[2] = squaresY[3];
+    	let squaresY[3] = squaresY[4];
+    	let squaresY[4] = squaresY[5];
+    	let squaresY[5] = squaresY[6];
+    	let squaresY[6] = squaresY[7];
+    	let squaresY[7] = squaresY[0];
+    	return;
+    }
+
+    method void resetCounter() {
+    	let counter = 1;
+    	return;
+    }
+
+    method void calculateCollisionCoords() {
+    	var int pointer;
+    	let pointer = 0;
+    	while (~(pointer = counter)) {
+    		let collisX[pointer] = squaresX[pointer] + 15;
+    		let collisY[pointer] = squaresY[pointer] + 15;
+    		let pointer = pointer + 1;
+    	}
+    	return;
+    }
+
+    method Array getCollisionYCoords() {
+    	return collisY;
+    }
+
+    method Array getCollisionXCoords() {
+    	return collisX;
+    }
+
+    method int getCounter() {
+    	return counter;
+    }
+
+	method void draw(boolean background, int x, int y) {
+		do Screen.setColor(background);
+	    do Screen.drawRectangle(x, y, (x + 30), (y + 30));
+	    return;
+	}
+
+	method void spawnNewSquare() {
+		let squaresX[counter] = 480;
+		do draw(true, squaresX[counter], squaresY[counter]);
+		return;
+	}
+
+	method void moveSquares(int level) {
+		var int pointer;
+		let pointer = 0;
+		while (~(pointer = counter)) {
+			if (squaresX[pointer] > level) {
+				do draw(false, squaresX[pointer], squaresY[pointer]);
+				let squaresX[pointer] = squaresX[pointer] - level;
+				do draw(true, squaresX[pointer], squaresY[pointer]);
+				if ((squaresX[pointer] > 120) & (squaresX[pointer] < 126) & (counter < 7)) {
+					do spawnNewSquare();
+					let counter = counter + 1;
+				}
+			} else {
+				do draw(false, squaresX[pointer], squaresY[pointer]);
+				let squaresX[pointer] = 479;
+				do draw(true, squaresX[pointer], squaresY[pointer]);
+			}
+			let pointer = pointer + 1;
+		}
+		return;
+	}
+}

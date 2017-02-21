@@ -1,0 +1,11 @@
+// Main driver for Jack DontBeASquare program
+
+class Main {
+    function void main() {
+        var DontBeASquare game;
+        let game = DontBeASquare.new();
+        do game.run();
+        do game.dispose();
+        return;
+    }
+}

@@ -1,0 +1,176 @@
+// main game controller for DontBeASquare, a game where one dot is hopelessly surrounded by squares.
+
+class DontBeASquare {
+	field Dot dot;
+	field EnemySquares squares;
+	field int direction;
+	field int difficulty;
+	field int level;
+
+	constructor DontBeASquare new() {
+		let dot = Dot.new(50, 50);
+		let squares = EnemySquares.new();
+		let direction = 0;
+		let difficulty = 40;
+		let level = 1;
+		return this;
+	}
+
+	   /** Disposes this game. */
+	method void dispose() {
+      do dot.dispose();
+      do Memory.deAlloc(this);
+      return;
+   	}
+
+   	method void moveDot() {
+      	if (direction = 1) { do dot.moveUp(); }
+      	if (direction = 2) { do dot.moveDown(); }
+      	if (direction = 3) { do dot.moveLeft(); }
+      	if (direction = 4) { do dot.moveRight(); }
+      	return;
+   	}
+
+   	method void drawLevel() {
+   		do Output.moveCursor(0, 0);
+   		do Output.printString("Level ");
+   		do Output.printInt(level);
+   		return;
+   	}
+
+   	method void drawOpeningScreen() {
+   		do Output.moveCursor(3, 10);
+   		do Output.printString("In a world of squares, Dot is different.");
+   		do Output.moveCursor(4, 10);
+   		do Output.printString("Don't be a square. Avoid the squares.");
+   		do Output.moveCursor(5, 10);
+   		do Output.printString("Your goal is to get to the right edge");
+   		do Output.moveCursor(6, 10);
+   		do Output.printString("without touching the lame squares.");
+   		do Output.moveCursor(7, 10);
+   		do Output.printString("Press up arrow to start.");
+   		return;
+   	}
+
+   	method char listenForDirectionKeys(char key) {
+   		if (key = 131) { let direction = 1; }   // up arrow
+        if (key = 133) { let direction = 2; }   // down arrow
+        if (key = 130) { let direction = 3; }   // left arrow
+        if (key = 132) { let direction = 4; }   // right arrow
+   		return key;
+   	}
+
+      /** Runs the game: handles the user's inputs and moves the square accordingly */
+   	method void run() {
+      	var char key;  // the key currently pressed by the user
+      	var boolean exit, exitTitle, isComplete;
+      	let exit = false;
+      	let exitTitle = false;
+      	let isComplete = false;
+
+      	// opening title
+      	do drawOpeningScreen();
+      	while (~exitTitle) {
+      		let key = Keyboard.keyPressed();
+      		if (key = 131) { let exitTitle = true; }
+      	}
+
+      	// clear screen after the title
+      	do Screen.clearScreen();
+      
+      	while (~exit) {
+         	// waits for a key to be pressed
+         	while (key = 0) {
+         		do drawLevel();
+            	let key = Keyboard.keyPressed();
+            	do dot.draw(true);
+            	do squares.moveSquares(5);
+            	do detectCollisions();
+            	do Sys.wait(difficulty);  // delays the next movement
+         	}
+         	if (key = 81)  { let exit = true; }     // q key
+         	let key = listenForDirectionKeys(key);
+         	// do moveDot();
+
+         // waits for the key to be released
+         	while (~(key = 0)) {
+         		do drawLevel();
+            	let key = Keyboard.keyPressed();
+            	do moveDot();
+            	do squares.moveSquares(5);
+            	do detectCollisions();
+            	do Sys.wait(difficulty);  // delays the next movement
+         	}
+
+         	// check for level completion
+         	let isComplete = isLevelComplete();
+         	if (isComplete) {
+         		do Screen.clearScreen();
+         		do Output.moveCursor(3, 10);
+         		do Output.printString("Good Job! Press Up for next level!");
+         	}
+         	while (isComplete) {
+         		let key = Keyboard.keyPressed();
+         		if (key = 131) {
+         			do Screen.clearScreen();
+         			if (difficulty > 4) {
+         				let difficulty = difficulty - 5;
+         			}
+         			let isComplete = false;
+         			let level = level + 1;
+         			// need to reset the game board for next round
+         			do dot.resetDot();
+         			do squares.resetCounter();
+         			do squares.shuffleYArray();
+         		}
+         	}
+     	}
+     	return;
+   	}
+
+   	method void detectCollisions() {
+   		var int pointer, prod1, prod2, addition;
+   		var Array collisX, collisY;
+   		let pointer = 0;
+   		do squares.calculateCollisionCoords();
+   		let collisX = squares.getCollisionXCoords();
+   		let collisY = squares.getCollisionYCoords();
+   		while (~(pointer = squares.getCounter())) {
+   			let prod1 = Math.abs(dot.getX() - collisX[pointer]);
+   			let prod2 = Math.abs(dot.getY() - collisY[pointer]);
+   			// close enough to do distance equation
+   			if ((prod1 < 26) & (prod2 < 26)) {
+	   			let prod1 = Math.multiply(prod1, prod1);
+	   			let prod2 = Math.multiply(prod2, prod2);
+	   			do Output.printInt(prod2);
+	   			let prod1 = prod1 + prod2;
+	   			let prod1 = Math.sqrt(prod1);
+	   			if (prod1 < 25) {
+	   				//do Screen.clearScreen();
+	   				do Output.moveCursor(3, 10);
+	   				do Output.printString("Sorry you were hit! Try again!");
+	   				do Output.moveCursor(4, 10);
+	   				do Output.printString("Congrats! You made it to level ");
+	   				do Output.printInt(level);
+	   				do Sys.halt();
+	   			}
+   			}
+   			let pointer = pointer + 1;
+   		}
+   		return;
+   	}
+
+   	method boolean isLevelComplete() {
+   		var boolean isComplete;
+   		let isComplete = false;
+   		if (dot.getX() > 490) {
+   			let isComplete = true;
+   		}
+   		return isComplete;
+   	}
+
+
+
+
+
+}
