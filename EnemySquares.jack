@@ -1,5 +1,4 @@
-// manages the enemy squares on the screen
-
+/** The evil collection of squares out to get Dot */
 class EnemySquares {
 	field Array squaresX;
 	field Array squaresY;
@@ -7,6 +6,7 @@ class EnemySquares {
 	field Array collisY;
 	field int counter;
 
+    /** Constructs a new set of enemy squares */
 	constructor EnemySquares new() {
 		let counter = 1;
 		let squaresX = Array.new(8);
@@ -25,6 +25,7 @@ class EnemySquares {
         return;
     }
 
+    /** Updates Y coords of squares */
     method void levelArray(int first, int second, int third, int fourth, int fifth, int sixth, int seventh, int eighth) {
     	let squaresY[0] = first;
     	let squaresY[1] = second;
@@ -37,6 +38,7 @@ class EnemySquares {
     	return;
     }
 
+    /* shuffles array values by one spot */
     method void shuffleYArray() {
     	let squaresY[0] = squaresY[1];
     	let squaresY[1] = squaresY[2];
@@ -49,11 +51,13 @@ class EnemySquares {
     	return;
     }
 
+    /* resets the array counter */
     method void resetCounter() {
     	let counter = 1;
     	return;
     }
 
+    /* calculates what each square's center is */
     method void calculateCollisionCoords() {
     	var int pointer;
     	let pointer = 0;
@@ -65,37 +69,45 @@ class EnemySquares {
     	return;
     }
 
+    /* returns x coord of center of square */
     method Array getCollisionYCoords() {
     	return collisY;
     }
 
+    /* returns y coord of center of square */
     method Array getCollisionXCoords() {
     	return collisX;
     }
 
+    /** returns the counter variable, which tells caller how many squares in play */
     method int getCounter() {
     	return counter;
     }
 
+    /** draws or undraws a given square */
 	method void draw(boolean background, int x, int y) {
 		do Screen.setColor(background);
 	    do Screen.drawRectangle(x, y, (x + 30), (y + 30));
 	    return;
 	}
 
+    /** spawns a new square when reached on the counter */
 	method void spawnNewSquare() {
 		let squaresX[counter] = 480;
 		do draw(true, squaresX[counter], squaresY[counter]);
 		return;
 	}
 
-	method void moveSquares(int level) {
+    /**  Moves squares by iterating through whatever portion of
+        the array is currently in play. New squares are brought into
+        play once the previous one is part of the way across the screen */
+	method void moveSquares(int speed) {
 		var int pointer;
 		let pointer = 0;
 		while (~(pointer = counter)) {
-			if (squaresX[pointer] > level) {
+			if (squaresX[pointer] > speed) {
 				do draw(false, squaresX[pointer], squaresY[pointer]);
-				let squaresX[pointer] = squaresX[pointer] - level;
+				let squaresX[pointer] = squaresX[pointer] - speed;
 				do draw(true, squaresX[pointer], squaresY[pointer]);
 				if ((squaresX[pointer] > 120) & (squaresX[pointer] < 126) & (counter < 7)) {
 					do spawnNewSquare();

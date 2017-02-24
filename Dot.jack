@@ -1,10 +1,10 @@
-// our fearless hero Dot.
-
+/** Our protagonist, fearless Dot */
 class Dot {
 
 	field int x, y;
 	field int radius;
 
+  /** Constructs new Dot */ 
 	constructor Dot new(int Ax, int Ay) {
 		let x = Ax;		
 	    let y = Ay;
@@ -12,69 +12,73 @@ class Dot {
 	    return this;
 	}
 
-	/** Deallocates the Ball's memory. */
-    method void dispose() {
-        do Memory.deAlloc(this);
-        return;
-    }
+	/** Deallocates Dot's memory. */
+  method void dispose() {
+      do Memory.deAlloc(this);
+      return;
+  }
 
+  /** Draws and "undraws" Dot based on background */
 	method void draw(boolean background) {
 		do Screen.setColor(background);
-	    do Screen.drawCircle(x, y, radius);
-	    return;
-    }
+	  do Screen.drawCircle(x, y, radius);
+	  return;
+  }
 
-    method int getX() {
-    	return x;
-    }
+  /** returns Dot's x coords */
+  method int getX() {
+  	return x;
+  }
 
-    method int getY() {
-    	return y;
-    }
+  /** returns Dot's y coords */
+  method int getY() {
+  	return y;
+  }
 
-    method void resetDot() {
-    	let x = 50;
-    	let y = 50;
+  /** resets Dot to starting point */
+  method void resetDot() {
+  	let x = 50;
+  	let y = 50;
+  	return;
+  }
+
+ 	/** Moves Dot up by 4 pixels. */
+ 	method void moveUp() {
+  	if ((y - radius) > 1) {
+  		do draw(false);
+       	let y = y - 4;
+       	do draw(true);
+    	}
     	return;
-    }
+ 	}
 
-   	/** Moves Dot up by 2 pixels. */
-   	method void moveUp() {
-    	if ((y - radius) > 1) {
-    		do draw(false);
-         	let y = y - 4;
-         	do draw(true);
-      	}
-      	return;
-   	}
+ 	/** Moves Dot down by 4 pixels. */
+ 	method void moveDown() {
+    	if ((y + radius) < 250) {
+  		do draw(false);
+       	let y = y + 4;
+       	do draw(true);
+    	}
+    	return;
+ 	}
 
-   	/** Moves Dot down by 2 pixels. */
-   	method void moveDown() {
-      	if ((y + radius) < 250) {
-    		do draw(false);
-         	let y = y + 4;
-         	do draw(true);
-      	}
-      	return;
-   	}
+ 	/** Moves Dot left by 4 pixels. */
+ 	method void moveLeft() {
+    	if ((x - radius) > 1) {
+  		do draw(false);
+       	let x = x - 4;
+       	do draw(true);
+    	}
+    	return;
+ 	}
 
-   	/** Moves Dot left by 2 pixels. */
-   	method void moveLeft() {
-      	if ((x - radius) > 1) {
-    		do draw(false);
-         	let x = x - 4;
-         	do draw(true);
-      	}
-      	return;
-   	}
-
-   /** Moves Dot right by 2 pixels. */
-   	method void moveRight() {
-    	if ((x + radius) < 505) {
-    		do draw(false);
-         	let x = x + 4;
-         	do draw(true);
-      	}
-      	return;
-   	}
+ /** Moves Dot right by 4 pixels. */
+ 	method void moveRight() {
+  	if ((x + radius) < 505) {
+  		do draw(false);
+       	let x = x + 4;
+       	do draw(true);
+    	}
+    	return;
+ 	}
 }

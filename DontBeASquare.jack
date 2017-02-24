@@ -1,5 +1,6 @@
-// main game controller for DontBeASquare, a game where one dot is hopelessly surrounded by squares.
-
+/**
+ * The driver for the Don't Be A Square game.
+ */
 class DontBeASquare {
 	field Dot dot;
 	field EnemySquares squares;
@@ -7,22 +8,25 @@ class DontBeASquare {
 	field int difficulty;
 	field int level;
 
+   /** Constructs a new DontBeASquare with dot and squares */
 	constructor DontBeASquare new() {
-		let dot = Dot.new(50, 50);
+	   let dot = Dot.new(50, 50); // Dot always starts in upper left
 		let squares = EnemySquares.new();
 		let direction = 0;
-		let difficulty = 40;
-		let level = 1;
+		let difficulty = 40; // starting difficulty level. decreasing number is harder
+		let level = 1; // Beginning level
 		return this;
 	}
 
-	   /** Disposes this game. */
+	  /** Disposes this game and directs disposing of dot and squares */
 	method void dispose() {
       do dot.dispose();
+      do squares.dispose();
       do Memory.deAlloc(this);
       return;
    	}
 
+     /** Basic key mapping to dot's movement */
    	method void moveDot() {
       	if (direction = 1) { do dot.moveUp(); }
       	if (direction = 2) { do dot.moveDown(); }
@@ -31,6 +35,7 @@ class DontBeASquare {
       	return;
    	}
 
+      /** Level display in upper left */
    	method void drawLevel() {
    		do Output.moveCursor(0, 0);
    		do Output.printString("Level ");
@@ -38,6 +43,7 @@ class DontBeASquare {
    		return;
    	}
 
+     /** Opening title screen and game info */
    	method void drawOpeningScreen() {
    		do Output.moveCursor(3, 10);
    		do Output.printString("In a world of squares, Dot is different.");
@@ -46,12 +52,13 @@ class DontBeASquare {
    		do Output.moveCursor(5, 10);
    		do Output.printString("Your goal is to get to the right edge");
    		do Output.moveCursor(6, 10);
-   		do Output.printString("without touching the lame squares.");
+   		do Output.printString("without touching the mean squares.");
    		do Output.moveCursor(7, 10);
    		do Output.printString("Press up arrow to start.");
    		return;
    	}
 
+     /** Map keys pressed to direction integer value */
    	method char listenForDirectionKeys(char key) {
    		if (key = 131) { let direction = 1; }   // up arrow
         if (key = 133) { let direction = 2; }   // down arrow
@@ -60,7 +67,11 @@ class DontBeASquare {
    		return key;
    	}
 
-      /** Runs the game: handles the user's inputs and moves the square accordingly */
+      /** Runs the game: handles the user's inputs and does the following:
+         - Directs movement of dot and squares
+         - Directs collision detection and ends game if so
+         - Detects if the level is complete
+       */
    	method void run() {
       	var char key;  // the key currently pressed by the user
       	var boolean exit, exitTitle, isComplete;
@@ -75,24 +86,22 @@ class DontBeASquare {
       		if (key = 131) { let exitTitle = true; }
       	}
 
-      	// clear screen after the title
-      	do Screen.clearScreen();
-      
+      	do Screen.clearScreen(); // clear screen after the title
+
       	while (~exit) {
          	// waits for a key to be pressed
          	while (key = 0) {
          		do drawLevel();
             	let key = Keyboard.keyPressed();
-            	do dot.draw(true);
-            	do squares.moveSquares(5);
+            	do dot.draw(true); // while idle, will keep drawing Dot in place
+            	do squares.moveSquares(5); // moves squares 5 at a time. Could be implemented to be variable and add complexity to difficulty
             	do detectCollisions();
-            	do Sys.wait(difficulty);  // delays the next movement
+            	do Sys.wait(difficulty);  // delays the next movement. Longer the delay easier it is
          	}
          	if (key = 81)  { let exit = true; }     // q key
          	let key = listenForDirectionKeys(key);
-         	// do moveDot();
 
-         // waits for the key to be released
+            // waits for the key to be released
          	while (~(key = 0)) {
          		do drawLevel();
             	let key = Keyboard.keyPressed();
@@ -121,13 +130,14 @@ class DontBeASquare {
          			// need to reset the game board for next round
          			do dot.resetDot();
          			do squares.resetCounter();
-         			do squares.shuffleYArray();
+         			do squares.shuffleYArray(); // iterate the pattern of squares flying out
          		}
          	}
      	}
      	return;
    	}
 
+      /** Detects collisions between Dot and squares by using simple distance equation */
    	method void detectCollisions() {
    		var int pointer, prod1, prod2, addition;
    		var Array collisX, collisY;
@@ -138,20 +148,21 @@ class DontBeASquare {
    		while (~(pointer = squares.getCounter())) {
    			let prod1 = Math.abs(dot.getX() - collisX[pointer]);
    			let prod2 = Math.abs(dot.getY() - collisY[pointer]);
-   			// close enough to do distance equation
+   			// close enough to do distance equation, otherwise may be working with integers that are too large
    			if ((prod1 < 26) & (prod2 < 26)) {
 	   			let prod1 = Math.multiply(prod1, prod1);
 	   			let prod2 = Math.multiply(prod2, prod2);
 	   			do Output.printInt(prod2);
 	   			let prod1 = prod1 + prod2;
 	   			let prod1 = Math.sqrt(prod1);
-	   			if (prod1 < 25) {
-	   				//do Screen.clearScreen();
-	   				do Output.moveCursor(3, 10);
-	   				do Output.printString("Sorry you were hit! Try again!");
+	   			if (prod1 < 25) { // if the distance is less than a square's "radius" + Dot's, it's a collision. Not perfect, but favors the player
+	   				do Screen.clearScreen();
+                  do Output.moveCursor(3, 10);
+	   				do Output.printString("Sorry, you were hit!");
 	   				do Output.moveCursor(4, 10);
-	   				do Output.printString("Congrats! You made it to level ");
+	   				do Output.printString("You made it to level ");
 	   				do Output.printInt(level);
+                  do Output.printString(". Try Again");
 	   				do Sys.halt();
 	   			}
    			}
@@ -160,6 +171,7 @@ class DontBeASquare {
    		return;
    	}
 
+      /** Checks if Dot is at the end of the level and returns boolean */
    	method boolean isLevelComplete() {
    		var boolean isComplete;
    		let isComplete = false;

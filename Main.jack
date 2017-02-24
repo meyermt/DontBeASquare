@@ -1,11 +1,12 @@
-// Main driver for Jack DontBeASquare program
-
+/**
+ * The main class of the Don't Be A Square game.
+ */
 class Main {
-    function void main() {
-        var DontBeASquare game;
-        let game = DontBeASquare.new();
-        do game.run();
-        do game.dispose();
-        return;
-    }
+	function void main() {
+	    var DontBeASquare game;
+	    let game = DontBeASquare.new();
+	    do game.run();
+	    do game.dispose();
+	    return;
+	}
 }
