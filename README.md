@@ -15,7 +15,7 @@ q - This will exit the game
 
 This assumes you have a JackCompiler and a VMEmulator available for use.
 
-1. In a terminal/shell/cmd prompt session, run the following command: `<path-to-JackCompiler>/JackCompiler.sh <path-to-proj>/DontBeASquare
+1. In a terminal/shell/cmd prompt session, run the following command: `<path-to-JackCompiler>/JackCompiler.sh <path-to-proj>/DontBeASquare`
 2. In an instance of VMEmulator, load the DontBeASquare folder.
 3. Enjoy your time as Dot.
 
